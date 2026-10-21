@@ -3,7 +3,8 @@ package by.ipprpo.autoservice.model;
 /** Статус самого заказа-наряда (отдельно от статуса ремонта). */
 public enum OrderStatus {
     OPEN("Открыт"),
-    CLOSED("Завершён");
+    CLOSED("Завершён"),
+    CANCELLED("Отменён");
 
     private final String title;
 

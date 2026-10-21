@@ -39,5 +39,9 @@ public class Main {
 
         System.out.println("\n=== Завершение заказа после выполненного ремонта ===");
         System.out.println(service.completeOrder(order.getId()));
+
+        System.out.println("\n=== ЛР №4: новый сценарий — отмена заказа ===");
+        RepairOrder second = service.createOrder(customer, car, "Замена фильтров");
+        System.out.println(service.cancelOrder(second.getId()));
     }
 }

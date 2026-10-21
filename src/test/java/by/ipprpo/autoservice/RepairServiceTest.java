@@ -85,6 +85,40 @@ class RepairServiceTest {
                 () -> service.changeRepairStatus(order.getId(), RepairStatus.IN_PROGRESS));
     }
 
+    /** ЛР №4, тест 1: заказ, по которому ремонт ещё не начат, можно отменить. */
+    @Test
+    void waitingOrderCanBeCancelled() {
+        RepairOrder order = service.createOrder(customer, car, "Замена фильтров");
+
+        service.cancelOrder(order.getId());
+
+        RepairOrder result = service.getOrder(order.getId());
+        assertEquals(OrderStatus.CANCELLED, result.getOrderStatus());
+        assertEquals(RepairStatus.WAITING, result.getRepairStatus());
+    }
+
+    /** ЛР №4, тест 2: если ремонт уже начат, отменить заказ нельзя. */
+    @Test
+    void orderCannotBeCancelledWhenRepairStarted() {
+        RepairOrder order = service.createOrder(customer, car, "Замена сцепления");
+        service.changeRepairStatus(order.getId(), RepairStatus.IN_PROGRESS);
+
+        assertThrows(IllegalStateException.class, () -> service.cancelOrder(order.getId()));
+        assertEquals(OrderStatus.OPEN, service.getOrder(order.getId()).getOrderStatus());
+    }
+
+    /** ЛР №4, тест 3: отменённый заказ нельзя ни продолжить, ни завершить, ни отменить повторно. */
+    @Test
+    void cancelledOrderCannotBeProcessedFurther() {
+        RepairOrder order = service.createOrder(customer, car, "Покраска бампера");
+        service.cancelOrder(order.getId());
+
+        assertThrows(IllegalStateException.class,
+                () -> service.changeRepairStatus(order.getId(), RepairStatus.IN_PROGRESS));
+        assertThrows(IllegalStateException.class, () -> service.completeOrder(order.getId()));
+        assertThrows(IllegalStateException.class, () -> service.cancelOrder(order.getId()));
+    }
+
     /**
      * Дополнительный тест на слабую связанность: сервис работает с тестовой
      * (fake) реализацией интерфейса RepairRepository, а не с настоящим хранилищем.

@@ -40,8 +40,9 @@ public class RepairService {
     /** Индивидуальное задание, часть 1: изменение статуса ремонта. */
     public RepairOrder changeRepairStatus(int orderId, RepairStatus newStatus) {
         RepairOrder order = getOrder(orderId);
-        if (order.getOrderStatus() == OrderStatus.CLOSED) {
-            throw new IllegalStateException("Заказ уже завершён, статус ремонта менять нельзя");
+        if (order.getOrderStatus() != OrderStatus.OPEN) {
+            throw new IllegalStateException("Заказ уже не открыт ("
+                    + order.getOrderStatus() + "), статус ремонта менять нельзя");
         }
         if (!order.getRepairStatus().canMoveTo(newStatus)) {
             throw new IllegalStateException("Недопустимый переход статуса ремонта: "
@@ -55,14 +56,33 @@ public class RepairService {
     /** Индивидуальное задание, часть 2: завершение заказа запрещено, пока ремонт не выполнен. */
     public RepairOrder completeOrder(int orderId) {
         RepairOrder order = getOrder(orderId);
-        if (order.getOrderStatus() == OrderStatus.CLOSED) {
-            throw new IllegalStateException("Заказ уже завершён");
+        if (order.getOrderStatus() != OrderStatus.OPEN) {
+            throw new IllegalStateException("Заказ уже не открыт (" + order.getOrderStatus() + ")");
         }
         if (order.getRepairStatus() != RepairStatus.DONE) {
             throw new IllegalStateException(
                     "Нельзя завершить заказ: ремонт ещё не выполнен (" + order.getRepairStatus() + ")");
         }
         order.setOrderStatus(OrderStatus.CLOSED);
+        repository.save(order);
+        return order;
+    }
+
+    /**
+     * Индивидуальное задание ЛР №4 (вариант 4): новый сценарий обработки заказа — отмена.
+     * Отменить можно только открытый заказ, по которому ремонт ещё не начат (статус WAITING).
+     * Если ремонт уже идёт или выполнен, заказ отменить нельзя.
+     */
+    public RepairOrder cancelOrder(int orderId) {
+        RepairOrder order = getOrder(orderId);
+        if (order.getOrderStatus() != OrderStatus.OPEN) {
+            throw new IllegalStateException("Заказ уже не открыт (" + order.getOrderStatus() + ")");
+        }
+        if (order.getRepairStatus() != RepairStatus.WAITING) {
+            throw new IllegalStateException(
+                    "Нельзя отменить заказ: ремонт уже начат (" + order.getRepairStatus() + ")");
+        }
+        order.setOrderStatus(OrderStatus.CANCELLED);
         repository.save(order);
         return order;
     }
