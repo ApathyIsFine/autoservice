@@ -1,0 +1,38 @@
+// Jenkinsfile.linux — тот же конвейер для Linux/macOS-агента (используется sh).
+// Для Windows см. Jenkinsfile (bat).
+pipeline {
+
+    // На каком агенте выполнять Pipeline: любой доступный
+    agent any
+
+    stages {
+
+        // Этап 1. Компиляция основного кода
+        stage('Build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+
+        // Этап 2. Запуск JUnit-тестов (при падении теста Pipeline остановится здесь)
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        // Этап 3. Упаковка в JAR (тесты уже были выполнены на этапе Test)
+        stage('Package') {
+            steps {
+                sh 'mvn package -DskipTests'
+            }
+        }
+
+        // Индивидуальное задание (вариант 4): показать результат сборки в каталоге target
+        stage('Inspect Target') {
+            steps {
+                sh 'ls -la target'
+            }
+        }
+    }
+}
