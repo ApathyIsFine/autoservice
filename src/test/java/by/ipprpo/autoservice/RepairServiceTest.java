@@ -119,6 +119,12 @@ class RepairServiceTest {
         assertThrows(IllegalStateException.class, () -> service.cancelOrder(order.getId()));
     }
 
+    /** ЛР №4, тест 4 (добавляется отдельным commit для проверки автоматического запуска Jenkins). */
+    @Test
+    void cancellingUnknownOrderFails() {
+        assertThrows(IllegalArgumentException.class, () -> service.cancelOrder(999));
+    }
+
     /**
      * Дополнительный тест на слабую связанность: сервис работает с тестовой
      * (fake) реализацией интерфейса RepairRepository, а не с настоящим хранилищем.
