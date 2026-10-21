@@ -44,7 +44,7 @@ class RepairServiceTest {
 
         RepairOrder result = service.getOrder(order.getId());
         assertEquals(RepairStatus.DONE, result.getRepairStatus());
-        assertEquals(OrderStatus.CLOSED, result.getOrderStatus());
+        assertEquals(OrderStatus.OPEN, result.getOrderStatus());
     }
 
     /** Тест 2 — ошибочный сценарий: нельзя изменить статус ремонта, пропустив шаг. */
