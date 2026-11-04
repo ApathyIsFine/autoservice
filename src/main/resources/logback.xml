@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Конфигурация Logback: куда и в каком формате выводятся сообщения журнала -->
+<configuration>
+
+    <!-- Вывод в консоль: время, уровень, короткое имя класса, сообщение -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{0} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Вывод в файл logs/autoservice.log (каталог logs/ добавлен в .gitignore) -->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/autoservice.log</file>
+        <append>true</append>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Минимальный уровень сообщений: INFO (DEBUG и TRACE не выводятся) -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>

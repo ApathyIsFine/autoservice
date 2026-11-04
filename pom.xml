@@ -19,9 +19,23 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.10.1</junit.version>
+        <slf4j.version>1.7.32</slf4j.version>
+        <logback.version>1.2.11</logback.version>
     </properties>
 
     <dependencies>
+        <!-- ЛР №5. Logging: SLF4J — интерфейс (фасад), Logback — реализация -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
         <!-- JUnit 5: нужен только для тестов (scope = test), в JAR не попадает -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

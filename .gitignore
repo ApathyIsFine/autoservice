@@ -4,3 +4,6 @@ target/
 # Служебные файлы IDE
 .idea/
 *.iml
+
+# Файлы журнала приложения (Logback)
+logs/

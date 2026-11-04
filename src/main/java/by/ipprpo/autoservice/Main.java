@@ -7,12 +7,17 @@ import by.ipprpo.autoservice.model.RepairStatus;
 import by.ipprpo.autoservice.repository.InMemoryRepairRepository;
 import by.ipprpo.autoservice.repository.RepairRepository;
 import by.ipprpo.autoservice.service.RepairService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Слой Application. Единственное место, где создаются конкретные объекты
  * и связываются между собой (внедряются зависимости).
+ * Вывод в консоль выполняется через Logger (SLF4J + Logback), а не через System.out.println().
  */
 public class Main {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         // Сборка зависимостей: Repository -> Service
@@ -20,28 +25,29 @@ public class Main {
         RepairService service = new RepairService(repository);
 
         Customer customer = new Customer(1, "Иван Петров", "+7-900-111-22-33");
-        Car car = new Car(1, "А123БВ", "Toyota", "Camry", customer);
+        Customer stranger = new Customer(2, "Анна Сидорова", "+7-900-444-55-66");
+        Car car = new Car(1, "A123BV", "Toyota", "Camry", customer);
 
-        System.out.println("=== Основная операция: создание заказа ===");
-        RepairOrder order = service.createOrder(customer, car, "Замена тормозных колодок");
-        System.out.println(order);
+        LOGGER.info("=== Scenario 1: successful service (INFO) ===");
+        RepairOrder order = service.createOrder(customer, car, "Brake pads replacement");
+        service.changeRepairStatus(order.getId(), RepairStatus.IN_PROGRESS);
+        service.changeRepairStatus(order.getId(), RepairStatus.DONE);
+        service.completeOrder(order.getId());
 
-        System.out.println("\n=== Индивидуальное задание: попытка завершить заказ до ремонта ===");
+        LOGGER.info("=== Scenario 2: problem situations (WARN) ===");
+        service.createOrder(customer, car, "Suspension diagnostics");
+        RepairOrder duplicate = service.createOrder(customer, car, "Oil change");
         try {
-            service.completeOrder(order.getId());
+            service.completeOrder(duplicate.getId());
         } catch (IllegalStateException e) {
-            System.out.println("Отказ: " + e.getMessage());
+            LOGGER.info("Operation rejected by business rule");
         }
 
-        System.out.println("\n=== Изменение статуса ремонта ===");
-        System.out.println(service.changeRepairStatus(order.getId(), RepairStatus.IN_PROGRESS));
-        System.out.println(service.changeRepairStatus(order.getId(), RepairStatus.DONE));
-
-        System.out.println("\n=== Завершение заказа после выполненного ремонта ===");
-        System.out.println(service.completeOrder(order.getId()));
-
-        System.out.println("\n=== ЛР №4: новый сценарий — отмена заказа ===");
-        RepairOrder second = service.createOrder(customer, car, "Замена фильтров");
-        System.out.println(service.cancelOrder(second.getId()));
+        LOGGER.info("=== Scenario 3: processing error (ERROR) ===");
+        try {
+            service.createOrder(stranger, car, "Repair of somebody else's car");
+        } catch (IllegalArgumentException e) {
+            LOGGER.info("Operation rejected: order was not created");
+        }
     }
 }
