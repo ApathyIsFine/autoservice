@@ -58,7 +58,7 @@ class RepairServiceTest {
         assertEquals(RepairStatus.WAITING, service.getOrder(order.getId()).getRepairStatus());
     }
 
-    /** Тест 3 — индивидуальное задание: нельзя завершить заказ, пока ремонт не выполнен. */
+    /** Тест 3 — индивидуальное задание: нельзя завершить заказ, пока ремонт не вполнен. */
     @Test
     void orderCannotBeCompletedBeforeRepairIsDone() {
         RepairOrder order = service.createOrder(customer, car, "Замена тормозных колодок");
